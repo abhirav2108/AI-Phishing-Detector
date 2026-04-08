@@ -1,0 +1,48 @@
+import streamlit as st
+
+# Set the title of your app
+st.title("🛡️ Phishing Risk Simulator")
+st.write("Adjust the features below to see how the AI evaluates phishing probability.")
+
+# Create a sidebar or main area for inputs
+st.header("Feature Inputs")
+url_length = st.slider("URL Length (characters)", min_value=10, max_value=200, value=45)
+subdomains = st.slider("Subdomain Count", min_value=0, max_value=10, value=1)
+urgent_keywords = st.slider("Presence of 'Urgent' Keywords", min_value=0, max_value=5, value=0)
+
+# Checkboxes for binary features
+contains_at = st.checkbox("Contains '@' Symbol in URL")
+uses_https = st.checkbox("Uses HTTPS", value=True)
+
+# --- Risk Calculation Logic ---
+# In your final project, this section will be replaced by your trained AI model (e.g., model.predict())
+risk_score = 5 # Baseline risk
+
+if url_length > 75:
+    risk_score += 20
+if subdomains > 3:
+    risk_score += 15
+if contains_at:
+    risk_score += 30
+if not uses_https:
+    risk_score += 10 # Lack of HTTPS adds risk
+risk_score += (urgent_keywords * 10)
+
+# Cap the score at 100%
+risk_score = min(risk_score, 100)
+
+# --- Display Results ---
+st.divider()
+st.header("Threat Assessment")
+
+# Display a large metric and a progress bar
+st.metric(label="Phishing Probability", value=f"{risk_score}%")
+st.progress(risk_score / 100)
+
+# Provide a dynamic warning message based on the score
+if risk_score < 30:
+    st.success("Low Risk: This communication appears normal.")
+elif risk_score < 70:
+    st.warning("Medium Risk: Proceed with caution. Inspect the sender carefully.")
+else:
+    st.error("High Risk: Do not click any links! Strong indicators of phishing detected.")
